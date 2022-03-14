@@ -1,2 +1,1 @@
 # TriCorrApplications
-Applications of TripleCorrelations
