@@ -2,10 +2,11 @@ using Base.Threads
 using DrWatson
 @quickactivate "TriCorrApplications"
 
-using GLMakie, AlgebraOfGraphics
+using CairoMakie
+using AlgebraOfGraphics
 # using DSP, Statistics, StatsBase
 ext = "png"
-using Random, JLD2, Dates, NamedDims, Statistics
+using Random, JLD2, Dates, NamedDims, Statistics, DataFrames
 
 using TriCorrApplications
 

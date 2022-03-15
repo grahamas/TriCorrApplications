@@ -2,10 +2,10 @@ module TriCorrApplications
 
 using CSV, DataFrames, DataFramesMeta,
     Dates,
-    GLMakie, 
+    CairoMakie, 
     AlgebraOfGraphics,
     ProgressMeter,
-    NamedDims
+    NamedDims, Statistics, StatsBase, DSP
 
 using TripleCorrelations
 
@@ -20,6 +20,8 @@ include("plot.jl")
 export plot_contributions, plot_contribution
 
 include("contributions.jl")
-export calc_contributions_timeseries
+export calc_contributions_timeseries_snippet_01,
+	calc_contributions_timeseries_channel_01,
+	calc_contributions_timeseries_channel_white
 
 end
