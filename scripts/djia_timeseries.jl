@@ -23,7 +23,7 @@ contributions, contributions_dates = if recalculate == true
     djia_fig = data(stack(djia_df, Not(:date))) * mapping(:date, :value, color=:variable) * visual(Lines) |> draw
     save(joinpath(plots_subdir, "djia_closing_prices.png"), djia_fig)
     (djia, trading_dates) = timeseries_from_df(djia_df)
-    contributions, contributions_dates = calc_contributions_timeseries_snippet_01(djia[:,1:100], trading_dates[1:100], λ_n, λ_t)
+    contributions, contributions_dates = calc_contributions_timeseries_snippet_01(djia, trading_dates, λ_n, λ_t)
     save(datadir("exp_pro", "$(task_name)_$(task_time).jld2"), Dict("contributions" => contributions, "contributions_dates" => contributions_dates))
     (contributions, contributions_dates)
 else
