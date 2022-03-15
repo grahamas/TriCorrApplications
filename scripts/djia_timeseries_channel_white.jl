@@ -11,7 +11,7 @@ using TriCorrApplications
 
 let (λ_n, λ_t) = (8,10), recalculate=true,
     start_date = Date("1981-05-01",dateformat"yyyy-mm-dd"),
-    task_name = "djia_sequential_contributions_start_$(Dates.format(start_date,"yyyy_mm_dd"))_lags_$(λ_n)_$(λ_t)",
+    task_name = "djia_seqcont_chanwhite_start_$(Dates.format(start_date,"yyyy_mm_dd"))_lags_$(λ_n)_$(λ_t)",
     task_time = Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS");
 
 plots_subdir = plotsdir("$(task_name)_$(task_time)_channel_white")
