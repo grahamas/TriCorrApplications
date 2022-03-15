@@ -5,7 +5,8 @@ using CSV, DataFrames, DataFramesMeta,
     CairoMakie, 
     AlgebraOfGraphics,
     ProgressMeter,
-    NamedDims, Statistics, StatsBase, DSP
+    NamedDims, Statistics, StatsBase, DSP,
+    MultivariateStats
 
 using TripleCorrelations
 
@@ -22,6 +23,7 @@ export plot_contributions, plot_contribution
 include("contributions.jl")
 export calc_contributions_timeseries_snippet_01,
 	calc_contributions_timeseries_channel_01,
-	calc_contributions_timeseries_channel_white
+	calc_contributions_timeseries_channel_znorm,
+    calc_contributions_timeseries_channels_white
 
 end

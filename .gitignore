@@ -31,3 +31,4 @@ plots
 *.mat
 LICENSE
 LocalPreferences.toml
+remote_plots/

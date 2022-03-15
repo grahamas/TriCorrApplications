@@ -11,10 +11,10 @@ using TriCorrApplications
 
 let (λ_n, λ_t) = (8,10), recalculate=true,
     start_date = Date("1981-05-01",dateformat"yyyy-mm-dd"),
-    task_name = "djia_seqcont_chanwhite_start_$(Dates.format(start_date,"yyyy_mm_dd"))_lags_$(λ_n)_$(λ_t)",
+    task_name = "djia_seqcont_channel_znorm_start_$(Dates.format(start_date,"yyyy_mm_dd"))_lags_$(λ_n)_$(λ_t)",
     task_time = Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS");
 
-plots_subdir = plotsdir("$(task_name)_$(task_time)_channel_white")
+plots_subdir = plotsdir("$(task_name)_$(task_time)_channel_znorm")
 mkpath(plots_subdir)
 
 contributions, contributions_dates = if recalculate == true
@@ -22,7 +22,7 @@ contributions, contributions_dates = if recalculate == true
     djia_fig = data(stack(djia_df, Not(:date))) * mapping(:date, :value, color=:variable) * visual(Lines) |> draw
     save(joinpath(plots_subdir, "djia_closing_prices.png"), djia_fig)
     (djia, trading_dates) = timeseries_from_df(djia_df)
-    contributions, contributions_dates = calc_contributions_timeseries_channel_white(djia, trading_dates, λ_n, λ_t)
+    contributions, contributions_dates = calc_contributions_timeseries_channel_znorm(djia[:,1:100], trading_dates[1:100], λ_n, λ_t)
     save(datadir("exp_pro", "$(task_name)_$(task_time).jld2"), Dict("contributions" => contributions, "contributions_dates" => contributions_dates))
     (contributions, contributions_dates)
 else
