@@ -49,3 +49,38 @@ function timeseries_from_df(df::DataFrame)
     timeseries = df[:, Not(:date)] |> Matrix
     (timeseries', dates)
 end
+
+abstract type AbstractTimeseriesEEG <: AbstractProcessedEEG end
+struct TimeseriesEEGv1{T} <: AbstractTimeseriesEEG
+    times::Vector{T}
+    data::Matrix{T}
+    channel_names::Vector{String}
+    indicators::Matrix{T}
+    indicator_names::Vector{String}
+end
+function get_signal(eeg::AbstractTimeseriesEEG)
+    eeg.data
+end
+get_times(eeg::AbstractTimeseriesEEG) = eeg.times
+get_channel_names(eeg::AbstractTimeseriesEEG) = eeg.channel_names
+
+function load_cattan_alpha_subject(num)
+    datadir = (dirs...) -> joinpath(homedir(), "git_data", "cattan_alpha_meditation", dirs...)
+    num_str = if num < 10
+        "0$num"
+    else
+        "$num"
+    end
+    data = matread(datadir("subject_$(num_str).mat")) |> values |> only
+    header = (matread(datadir("header.mat")) |> values |> only)[:]
+    @assert header[1] == "Time"
+    times = data[:,1]
+    @assert header[end-1] == "EyesClosed" && header[end] == "EyesOpened"
+    signal = NamedDimsArray{(:channel,:time)}(data[:,2:end-2]')
+    channel_names = header[2:end-2] 
+    indicators = NamedDimsArray{(:indicator,:time)}(data[:,end-1:end]')
+    indicator_names = headers[end-1:end]
+
+    TimeseriesEEGv1(times, data, channel_names, indicators, indicator_names)
+end
+
