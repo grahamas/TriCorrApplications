@@ -11,15 +11,17 @@ using Random, JLD2, MAT, Dates, NamedDims, Statistics, DataFrames
 using TriCorrApplications
 
 let (λ_n, λ_t) = (8,10), recalculate=true,
+    SUBJ = 1,
     datadir = (dirs...) -> joinpath(homedir(), "git_data", "cattan_alpha_meditation", dirs...);
 
-demographics_df = DataFrame(matread(datadir("demographic.mat")) |> values |> only .|> Int, matread(datadir("demographic_header.mat"))["demographicheader"][:])
+eeg = load_cattan_alpha_subject(SUBJ)
 
-subject_eeg = matread(datadir("subject_01.mat")) |> values |> only
-
-
-plots_subdir = plotsdir("$(task_name)_$(task_time)_snippet")
+plots_subdir = plotsdir("cattan_timeseries_subj$(lpad(SUBJ,2,"0"))")
 mkpath(plots_subdir)
+
+plot_eeg_traces(eeg)
+
+return
 
 contributions, contributions_dates = if recalculate == true
     djia_df = get_clean_djia(start_date=start_date)
