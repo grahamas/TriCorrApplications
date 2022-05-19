@@ -50,20 +50,6 @@ function timeseries_from_df(df::DataFrame)
     (timeseries', dates)
 end
 
-abstract type AbstractTimeseriesEEG <: AbstractProcessedEEG end
-struct TimeseriesEEGv1{T} <: AbstractTimeseriesEEG
-    times::Vector{T}
-    data::Matrix{T}
-    channel_names::Vector{String}
-    indicators::Matrix{T}
-    indicator_names::Vector{String}
-end
-function get_signal(eeg::AbstractTimeseriesEEG)
-    eeg.data
-end
-get_times(eeg::AbstractTimeseriesEEG) = eeg.times
-get_channel_names(eeg::AbstractTimeseriesEEG) = eeg.channel_names
-
 function load_cattan_alpha_subject(num)
     datadir = (dirs...) -> joinpath(homedir(), "git_data", "cattan_alpha_meditation", dirs...)
     num_str = lpad(num,2,"0")

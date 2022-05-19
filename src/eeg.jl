@@ -3,6 +3,20 @@ get_signal(::AbstractEEG) = error("unimplemented")
 get_times(::AbstractEEG) = error("unimplemented")
 get_channel_names(::AbstractEEG) = error("unimplemented")
 
+abstract type AbstractTimeseriesEEG <: AbstractEEG end
+struct TimeseriesEEGv1{T} <: AbstractTimeseriesEEG
+    times::Vector{T}
+    data::Matrix{T}
+    channel_names::Vector{String}
+    indicators::Matrix{T}
+    indicator_names::Vector{String}
+end
+function get_signal(eeg::AbstractTimeseriesEEG)
+    eeg.data
+end
+get_times(eeg::AbstractTimeseriesEEG) = eeg.times
+get_channel_names(eeg::AbstractTimeseriesEEG) = eeg.channel_names
+
 function plot_eeg_traces(eeg::AbstractEEG; labels=get_channel_names(eeg), std_max=nothing, sample_rate=eeg.sample_rate, downsample_factor=1, layout=:row)
     arr = NamedDimsArray{(:channel, :time)}(get_signal(eeg))
     arr = if std_max !== nothing
@@ -101,7 +115,7 @@ plot_contributions(arr::AbstractMatrix; kwargs...) = plot_contributions(DataFram
 
 noto_sans = assetpath("fonts", "NotoSans-Regular.ttf")
 
-function plot_contributions(times::AbstractVector, data::AbstractArray, eeg::AbstractProcessedEEG; title=nothing, resolution)
+function plot_contributions(times::AbstractVector, data::AbstractArray, eeg::AbstractEEG; title=nothing, resolution)
     n_rows = size(data, 1)
     fig = Figure(resolution = resolution, font = noto_sans)
     ax_plt_pairs = map(1:n_rows) do i_row
@@ -153,8 +167,4 @@ function plot_contribution!(ax, times::AbstractVector, data::AbstractVector; eeg
     l
 end
 
-function plot_reviewer_consensus!(ax, eeg::AbstractProcessedEEG)
-    lines!(ax, get_times(eeg, sample_rate=1), eeg.seizure_reviewers_count)
-    tightlimits!(ax); hidespines!(ax)
-    hidedecorations!(ax, ticklabels=false)
-end
+plot_reviewer_consensus!(ax, eeg::AbstractEEG) = error("unimplemented")
