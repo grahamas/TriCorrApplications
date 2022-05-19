@@ -6,7 +6,9 @@ using CSV, DataFrames, DataFramesMeta,
     AlgebraOfGraphics,
     ProgressMeter,
     NamedDims, Statistics, StatsBase, DSP,
-    MultivariateStats
+    MultivariateStats,
+    NamedDims, Dates
+
 
 using TripleCorrelations
 
@@ -25,5 +27,9 @@ export calc_contributions_timeseries_snippet_01,
 	calc_contributions_timeseries_channel_01,
 	calc_contributions_timeseries_channel_znorm,
     calc_contributions_timeseries_channels_white
+
+include("eeg.jl")
+export AbstractEEG, get_signal, get_times, get_channel_names,
+    plot_contributions, plot_eeg_traces, draw_eeg_traces
 
 end
