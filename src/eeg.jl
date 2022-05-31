@@ -115,29 +115,30 @@ plot_contributions(arr::AbstractMatrix; kwargs...) = plot_contributions(DataFram
 
 noto_sans = assetpath("fonts", "NotoSans-Regular.ttf")
 
-function plot_contributions(times::AbstractVector, data::AbstractArray, eeg::AbstractEEG; title=nothing, resolution)
+function plot_contributions(eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; title=nothing, resolution)
     n_rows = size(data, 1)
     fig = Figure(resolution = resolution, font = noto_sans)
     ax_plt_pairs = map(1:n_rows) do i_row
         ax = Axis(fig[i_row, 1], xlabel="", xgridvisible=false, ygridvisible=false)
-        plt = plot_contribution!(ax, times, data[i_row,:]; 
-            eeg=eeg
-        )
+        plt = plot_contribution!(eeg, ax, times, data[i_row,:])
         motif=offset_motif_numeral(i_row)
         Label(fig[i_row, 2], motif, tellheight=false, tellwidth=true, rotation=-pi/2)
         (ax, plt)
     end
+    cons_ax = Axis(Fig[n_rows+1,:])
+    plot_reviewer_consensus!(cons_ax, eeg)
+    linkxaxes!(first.(ax_plt_pairs)..., cons_ax)
     if title !== nothing
         Label(fig[0,:], title, tellwidth=false)
     end
     return fig
 end
 
-function plot_contribution(args...; title=nothing, resolution=(800,600),eeg=nothing, kwargs...)
+function plot_contribution(eeg::AbstractEEG, args...; title=nothing, resolution=(800,600), kwargs...)
     fig = Figure(resolution=resolution)
     ax = Axis(fig[1,1])
     cons_ax = Axis(fig[2,1])
-    l = plot_contribution!(ax, args...; eeg=eeg, kwargs...)
+    l = plot_contribution!(ax, eeg, args...; kwargs...)
     if title !== nothing
         Label(fig[0,:], title, tellwidth=false)
     end
@@ -147,7 +148,7 @@ function plot_contribution(args...; title=nothing, resolution=(800,600),eeg=noth
     return (fig, ax, l)
 end
 
-function plot_contribution!(ax, times::AbstractVector, data::AbstractVector; eeg=nothing)
+function plot_contribution!(ax, eeg::AbstractEEG, times::AbstractVector, data::AbstractVector)
     l = lines!(ax, times, data)
     tightlimits!(ax); hidespines!(ax)
     hidedecorations!(ax, ticklabels=false)
