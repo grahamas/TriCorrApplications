@@ -15,7 +15,7 @@ using TripleCorrelations
 include("../data/djia_tickers.jl")
 include("../data/recessions.jl")
 
-include("load.jl")
+include("load/stocks.jl")
 export get_clean_djia, timeseries_from_df,
     djia_tickers, recessions_since_1971
 

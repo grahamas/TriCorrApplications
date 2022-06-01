@@ -27,7 +27,6 @@ function plot_contribution!(ax, times::AbstractVector{<:Date}, contribution::Abs
     @warn "Plotting dates unsupported; defaulting to ints."
     l = lines!(ax, 1:length(times), contribution)
     tightlimits!(ax); hidespines!(ax)
-    hidedecorations!(ax, ticklabels=false)
     if events !== nothing
         onset_dxs = [findlast(Ref(on) .>= times) for (on, off) ∈ events if times[1] <= on < off < times[end]]
         offset_dxs = [findlast(Ref(off) .>= times) for (on, off) ∈ events if  times[1] <= on < off < times[end]]
