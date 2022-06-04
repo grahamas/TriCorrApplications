@@ -59,7 +59,7 @@ function draw_eeg_traces(eeg::AbstractEEG; title=nothing, resolution, kwargs...)
     labels = get_channel_names(eeg)
     for i_sig ∈ 1:size(signals, 1)
         ax = Axis(fig[i_sig,1])
-        plot_contribution!(ax, times, signals[i_sig,:]; eeg=eeg)
+        plot_contribution!(ax, eeg, times, signals[i_sig,:])
         Label(fig[i_sig,2], labels[i_sig], tellwidth=true, tellheight=false, rotation=-pi/2)
     end
     if title !== nothing
