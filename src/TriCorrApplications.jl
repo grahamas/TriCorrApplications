@@ -23,7 +23,8 @@ export get_clean_djia, timeseries_from_df,
 
 include("util.jl")
 include("plot.jl")
-export plot_contributions, plot_contribution
+export plot_contributions, plot_contribution,
+    plot_reviewer_consensus!
 
 include("contributions.jl")
 export calc_contributions_timeseries_snippet_01,
