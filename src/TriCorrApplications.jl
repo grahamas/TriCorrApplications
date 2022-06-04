@@ -21,6 +21,7 @@ export get_clean_djia, timeseries_from_df,
     djia_tickers, recessions_since_1971,
     load_cattan_alpha_subject
 
+include("util.jl")
 include("plot.jl")
 export plot_contributions, plot_contribution
 
