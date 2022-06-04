@@ -121,7 +121,7 @@ function plot_contributions(eeg::AbstractEEG, times::AbstractVector, data::Abstr
     fig = Figure(resolution = resolution, font = noto_sans)
     ax_plt_pairs = map(1:n_rows) do i_row
         ax = Axis(fig[i_row, 1], xlabel="", xgridvisible=false, ygridvisible=false)
-        plt = plot_contribution!(eeg, ax, times, data[i_row,:])
+        plt = plot_contribution!(ax, eeg, times, data[i_row,:])
         motif=offset_motif_numeral(i_row)
         Label(fig[i_row, 2], motif, tellheight=false, tellwidth=true, rotation=-pi/2)
         (ax, plt)
