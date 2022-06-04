@@ -4,11 +4,11 @@ get_times(::AbstractEEG) = error("unimplemented")
 get_channel_names(::AbstractEEG) = error("unimplemented")
 
 abstract type AbstractTimeseriesEEG <: AbstractEEG end
-struct TimeseriesEEGv1{T} <: AbstractTimeseriesEEG
+struct TimeseriesEEGv1{T,DATA<:AbstractMatrix{T},IND<:AbstractMatrix{T}} <: AbstractTimeseriesEEG
     times::Vector{T}
-    data::Matrix{T}
+    data::DATA#Matrix{T}
     channel_names::Vector{String}
-    indicators::Matrix{T}
+    indicators::IND#Matrix{T}
     indicator_names::Vector{String}
 end
 function get_signal(eeg::AbstractTimeseriesEEG)
@@ -17,7 +17,7 @@ end
 get_times(eeg::AbstractTimeseriesEEG) = eeg.times
 get_channel_names(eeg::AbstractTimeseriesEEG) = eeg.channel_names
 
-function plot_eeg_traces(eeg::AbstractEEG; labels=get_channel_names(eeg), std_max=nothing, sample_rate=eeg.sample_rate, downsample_factor=1, layout=:row)
+function plot_eeg_traces(eeg::AbstractEEG; labels=get_channel_names(eeg), std_max=nothing, downsample_factor=1, layout=:row)
     arr = NamedDimsArray{(:channel, :time)}(get_signal(eeg))
     arr = if std_max !== nothing
         arr = copy(arr)
@@ -32,6 +32,7 @@ function plot_eeg_traces(eeg::AbstractEEG; labels=get_channel_names(eeg), std_ma
     end
     time = get_times(eeg)[begin:downsample_factor:end]
     arr = arr[:,begin:downsample_factor:end]
+    @show size(arr)
     tbl = if labels === nothing
         Tables.table(arr', header=["$i" for i ∈ axes(arr, :channel)])
     else

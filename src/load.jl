@@ -59,9 +59,9 @@ function load_cattan_alpha_subject(num)
     times = data[:,1]
     @assert header[end-1] == "EyesClosed" && header[end] == "EyesOpened"
     signal = NamedDimsArray{(:channel,:time)}(data[:,2:end-2]')
-    channel_names = header[2:end-2] 
+    channel_names = string.(header[2:end-2]) 
     indicators = NamedDimsArray{(:indicator,:time)}(data[:,end-1:end]')
-    indicator_names = headers[end-1:end]
+    indicator_names = string.(header[end-1:end])
 
     TimeseriesEEGv1(times, data, channel_names, indicators, indicator_names)
 end
