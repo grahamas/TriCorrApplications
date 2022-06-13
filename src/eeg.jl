@@ -53,19 +53,29 @@ function plot_eeg_traces(eeg::AbstractEEG; labels=get_channel_names(eeg), std_ma
     return plt
 end
 
-function draw_eeg_traces(eeg::AbstractEEG; title=nothing, resolution, kwargs...)
-    fig = Figure(resolution=resolution)
-    times = get_times(eeg)
-    signals = get_signal(eeg)
-    labels = get_channel_names(eeg)
-    for i_sig ∈ 1:size(signals, 1)
+function draw_eeg_traces!(fig, times, eeg; title=nothing, kwargs...)
+    signals = @lift get_signal($eeg)
+    labels = @lift get_channel_names($eeg)
+    for i_sig ∈ 1:size(signals[], 1)
+        label = @lift $(labels)[i_sig]
         ax = Axis(fig[i_sig,1])
-        plot_contribution!(ax, eeg, times, signals[i_sig,:])
-        Label(fig[i_sig,2], labels[i_sig], tellwidth=true, tellheight=false, rotation=-pi/2)
+        plot_contribution!(ax, eeg, times, signals[][i_sig,:])
+        Label(fig[i_sig,2], label, tellwidth=true, tellheight=false, rotation=-pi/2)
     end
     if title !== nothing
         Label(fig[0,:], title, tellwidth=false)
     end
+    fig
+end
+
+function draw_eeg_traces!(fig, eeg; kwargs...)
+    times = @lift get_times($eeg)
+    draw_eeg_traces!(fig, times, eeg; kwargs...)
+end
+
+function draw_eeg_traces(eeg; resolution, kwargs...)
+    fig = Figure(resolution=resolution)
+    draw_eeg_traces!(fig, eeg; kwargs...) 
     fig
 end
 
@@ -149,22 +159,19 @@ function plot_contribution(eeg::AbstractEEG, args...; title=nothing, resolution=
     return (fig, ax, l)
 end
 
-function plot_contribution!(ax, eeg::AbstractEEG, times::AbstractVector, data::AbstractVector)
+function plot_contribution!(ax::Axis, eeg, times, data)
     l = lines!(ax, times, data)
     tightlimits!(ax); hidespines!(ax)
     hidedecorations!(ax, ticklabels=false)
-    if eeg !== nothing
-        seizure_onsets = [on for (on,off) in eeg.seizure_annotations if on < off]
-        seizure_offsets = [off for (on,off) in eeg.seizure_annotations if on < off]
-        artifact_onsets = [on for (on,off) in eeg.artifact_annotations if on < off]
-        artifact_offsets = [off for (on,off) in eeg.artifact_annotations if on < off]
-        if !isempty(artifact_onsets)
-            vspan!(ax, artifact_onsets, artifact_offsets, color=(:red, 0.2))
-        end
-        if !isempty(seizure_onsets)
-            @warn "No seizures."
-            vspan!(ax, seizure_onsets, seizure_offsets, color=(:blue, 0.2))
-        end
+    seizure_onsets = @lift [on for (on,off) in $eeg.seizure_annotations if on < off]
+    seizure_offsets = @lift [off for (on,off) in $eeg.seizure_annotations if on < off]
+    artifact_onsets = @lift [on for (on,off) in $eeg.artifact_annotations if on < off]
+    artifact_offsets = @lift [off for (on,off) in $eeg.artifact_annotations if on < off]
+    if !isempty(artifact_onsets[])
+        vspan!(ax, artifact_onsets, artifact_offsets, color=(:red, 0.2))
+    end
+    if !isempty(seizure_onsets[])
+        vspan!(ax, seizure_onsets, seizure_offsets, color=(:blue, 0.2))
     end
     l
 end
