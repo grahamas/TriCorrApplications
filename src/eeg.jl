@@ -54,18 +54,19 @@ function plot_eeg_traces(eeg::AbstractEEG; labels=get_channel_names(eeg), std_ma
 end
 
 function draw_eeg_traces!(fig, times, eeg; title=nothing, kwargs...)
+    layout = GridLayout()
     signals = get_signal(eeg)
     labels = get_channel_names(eeg)
     for i_sig ∈ 1:size(signals, 1)
         label = (labels)[i_sig]
-        ax = Axis(fig[i_sig,1])
+        layout[i_sig,1] = ax = Axis(fig)
         plot_contribution!(ax, eeg, times, signals[i_sig,:])
-        Label(fig[i_sig,2], label, tellwidth=true, tellheight=false, rotation=-pi/2)
+        layout[i_sig,2] = Label(fig, label, tellwidth=true, tellheight=false, rotation=-pi/2)
     end
     if title !== nothing
-        Label(fig[0,:], title, tellwidth=false)
+        layout[0,:] = Label(fig, title, tellwidth=false)
     end
-    fig
+    layout
 end
 
 function draw_eeg_traces!(fig, eeg; kwargs...)
@@ -126,22 +127,28 @@ plot_contributions(arr::AbstractMatrix; kwargs...) = plot_contributions(DataFram
 
 noto_sans = assetpath("fonts", "NotoSans-Regular.ttf")
 
-function plot_contributions(eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; title=nothing, resolution)
+function plot_contributions!(fig, eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; title=nothing, get_label=offset_motif_numeral)
     n_rows = size(data, 1)
-    fig = Figure(resolution = resolution, font = noto_sans)
+    layout = GridLayout()
     ax_plt_pairs = map(1:n_rows) do i_row
-        ax = Axis(fig[i_row, 1], xlabel="", xgridvisible=false, ygridvisible=false)
+        layout[i_row, 1] = ax = Axis(fig, xlabel="", xgridvisible=false, ygridvisible=false)
         plt = plot_contribution!(ax, eeg, times, data[i_row,:])
-        motif=offset_motif_numeral(i_row)
-        Label(fig[i_row, 2], motif, tellheight=false, tellwidth=true, rotation=-pi/2)
+        motif=get_label(i_row)
+        layout[i_row, 2] = Label(fig, motif, tellheight=false, tellwidth=true, rotation=-pi/2)
         (ax, plt)
     end
-    cons_ax = Axis(fig[n_rows+1,1])
+    layout[n_rows+1,1] = cons_ax = Axis(fig)
     plot_reviewer_consensus!(cons_ax, eeg)
     linkxaxes!(first.(ax_plt_pairs)..., cons_ax)
     if title !== nothing
-        Label(fig[0,:], title, tellwidth=false)
+        layout[0,:] = Label(fig, title, tellwidth=false)
     end
+    return layout
+end
+
+function plot_contributions(eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; resolution, kwargs...)
+    fig = Figure(resolution = resolution, font = noto_sans)
+    fig[1,1] = plot_contributions!(fig, eeg, times, data; kwargs...)
     return fig
 end
 

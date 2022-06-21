@@ -5,7 +5,7 @@ function plot_djia_stocks(djia=get_stocks_df(djia_tickers))
     plt = data(djia) * mapping(:date, :close, color=:ticker) * visual(Lines)
 end
 
-function plot_contributions(dates, contributions; title=nothing, resolution, events=nothing)
+function plot_contributions(dates, contributions; title=nothing, resolution, events=nothing, get_label=offset_motif_numeral)
     n_motifs = size(contributions, 1)
     fig = Figure(resolution=resolution, font=noto_sans)
     map(1:n_motifs) do i_row
@@ -13,7 +13,7 @@ function plot_contributions(dates, contributions; title=nothing, resolution, eve
         plt = plot_contribution!(ax, dates, contributions[i_row,:]; 
             events=events
         )
-        motif=roman_encode(i_row)
+        motif=get_label(i_row)
         Label(fig[i_row, 2], motif, tellheight=false, tellwidth=true, rotation=-pi/2)
         (ax, plt)
     end
