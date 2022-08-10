@@ -76,7 +76,8 @@ end
 
 function draw_eeg_traces(eeg; resolution, kwargs...)
     fig = Figure(resolution=resolution)
-    draw_eeg_traces!(fig, eeg; kwargs...) 
+    layout = draw_eeg_traces!(fig, eeg; kwargs...) 
+    fig[1,1] = layout
     fig
 end
 
