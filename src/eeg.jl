@@ -128,7 +128,7 @@ plot_contributions(arr::AbstractMatrix; kwargs...) = plot_contributions(DataFram
 
 noto_sans = assetpath("fonts", "NotoSans-Regular.ttf")
 
-function plot_contributions!(fig, eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; title=nothing, get_label=offset_motif_numeral)
+function plot_contributions!(fig, eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; title=nothing, get_label)
     n_rows = size(data, 1)
     layout = GridLayout()
     ax_plt_pairs = map(1:n_rows) do i_row
