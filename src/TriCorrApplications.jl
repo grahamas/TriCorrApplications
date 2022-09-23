@@ -22,6 +22,7 @@ export get_clean_djia, timeseries_from_df,
     load_cattan_alpha_subject
 
 include("util.jl")
+export discretize_bounds, merge_bounds, discretize_and_merge_bounds
 include("plot.jl")
 export plot_contributions, plot_contribution,
     plot_reviewer_consensus!

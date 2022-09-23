@@ -127,20 +127,41 @@ plot_contributions(vec::AbstractVector; kwargs...) = plot_contributions(DataFram
 plot_contributions(arr::AbstractMatrix; kwargs...) = plot_contributions(DataFrame(arr', :auto); kwargs...)
 
 noto_sans = assetpath("fonts", "NotoSans-Regular.ttf")
+noto_sans_bold = assetpath("fonts", "NotoSans-Bold.ttf")
 
-function plot_contributions!(fig, eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; title=nothing, get_label)
+
+
+function plot_contributions!(fig, eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; title=nothing, get_label, default_label_fns = Dict(
+    "tricorr" => offset_motif_numeral,
+    "aEEG" => (i -> eeg.labels[i])
+), consensus_plot=size(data,1), other_params...)
+    if get_label isa String
+        get_label = default_label_fns[get_label]
+    end
     n_rows = size(data, 1)
     layout = GridLayout()
     ax_plt_pairs = map(1:n_rows) do i_row
         layout[i_row, 1] = ax = Axis(fig, xlabel="", xgridvisible=false, ygridvisible=false)
-        plt = plot_contribution!(ax, eeg, times, data[i_row,:])
-        motif=get_label(i_row)
-        layout[i_row, 2] = Label(fig, motif, tellheight=false, tellwidth=true, rotation=-pi/2)
+        plt = plot_contribution!(ax, eeg, times, data[i_row,:]; other_params...)
+        if !isnothing(get_label)
+            signal_name=get_label(i_row)
+            layout[i_row, 2] = Label(fig, signal_name, tellheight=false, tellwidth=true, rotation=-pi/2)
+        end
         (ax, plt)
     end
-    layout[n_rows+1,1] = cons_ax = Axis(fig)
-    plot_reviewer_consensus!(cons_ax, eeg)
-    linkxaxes!(first.(ax_plt_pairs)..., cons_ax)
+    linkaxes!(first.(ax_plt_pairs)...)
+    for (ax,plt) ∈ ax_plt_pairs[1:end-1]
+        hidedecorations!(ax)
+    end
+    layout = if !isnothing(consensus_plot)
+        grand_layout = GridLayout()
+        grand_layout[consensus_plot,1] = layout
+        layout[consensus_plot+1,1] = cons_ax = Axis(fig)
+        plot_reviewer_consensus!(cons_ax, eeg)
+        linkxaxes!(first.(ax_plt_pairs)..., cons_ax)
+    else
+        layout
+    end
     if title !== nothing
         layout[0,:] = Label(fig, title, tellwidth=false)
     end
@@ -167,14 +188,22 @@ function plot_contribution(eeg::AbstractEEG, args...; title=nothing, resolution=
     return (fig, ax, l)
 end
 
-function plot_contribution!(ax::Axis, eeg, times, data)
-    l = lines!(ax, times, data)
+function plot_contribution!(ax::Axis, eeg, times, data; epoch_s=nothing)
+    l = lines!(ax, times, data, color=:grey11, linecolor=:grey11)
     tightlimits!(ax); hidespines!(ax)
     hidedecorations!(ax, ticklabels=false)
-    seizure_onsets = [on for (on,off) in eeg.seizure_annotations if on < off]
-    seizure_offsets = [off for (on,off) in eeg.seizure_annotations if on < off]
-    artifact_onsets = [on for (on,off) in eeg.artifact_annotations if on < off]
-    artifact_offsets = [off for (on,off) in eeg.artifact_annotations if on < off]
+    seizure_annotations, artifact_annotations = if isnothing(epoch_s)
+        (eeg.seizure_annotations, eeg.artifact_annotations)
+    else
+        (
+            discretize_and_merge_bounds(eeg.seizure_annotations,epoch_s),
+            discretize_and_merge_bounds(eeg.artifact_annotations,epoch_s)
+        )
+    end
+    seizure_onsets = [on for (on,off) in seizure_annotations if on < off]
+    seizure_offsets = [off for (on,off) in seizure_annotations if on < off]
+    artifact_onsets = [on for (on,off) in artifact_annotations if on < off]
+    artifact_offsets = [off for (on,off) in artifact_annotations if on < off]
     if !isempty(artifact_onsets)
         vspan!(ax, artifact_onsets, artifact_offsets, color=(:red, 0.2))
     end
