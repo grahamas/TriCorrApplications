@@ -36,10 +36,10 @@ function step_above(num::T, step, num_0) where T
     ceil(Int, (num - num_0) / step) * step
 end
 
-function discretize_bounds(bounds::ARR, step, bound_0=0) where ARR
+function discretize_bounds(bounds::ARR, step, bound_0=0; min_bound, max_bound) where ARR
     # FIXME warning does not keep bounds within any constraints
     ARR(map(bounds) do (start, stop)
-        (step_below(start, step, bound_0), step_above(stop, step, bound_0))
+        (max(min_bound,step_below(start, step, bound_0)), min(max_bound,step_above(stop, step, bound_0)))
     end)
 end
 
@@ -68,7 +68,7 @@ function merge_bounds(bounds1::AbstractVector{Tup}, bounds2::AbstractVector{Tup}
     return new_bounds
 end
 
-function discretize_and_merge_bounds(bounds, step)
-    posterized_bounds = discretize_bounds(bounds, step)
+function discretize_and_merge_bounds(bounds, step; min_bound, max_bound)
+    posterized_bounds = discretize_bounds(bounds, step; min_bound=min_bound, max_bound=max_bound)
     return merge_bounds(posterized_bounds, posterized_bounds)
 end

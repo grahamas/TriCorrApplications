@@ -192,8 +192,8 @@ function plot_contribution!(ax::Axis, eeg, times, data; epoch_s=nothing)
         (eeg.seizure_annotations, eeg.artifact_annotations)
     else
         (
-            discretize_and_merge_bounds(eeg.seizure_annotations,epoch_s),
-            discretize_and_merge_bounds(eeg.artifact_annotations,epoch_s)
+            discretize_and_merge_bounds(eeg.seizure_annotations,epoch_s; min_bound=times[begin], max_bound=times[end]),
+            discretize_and_merge_bounds(eeg.artifact_annotations,epoch_s; min_bound=times[begin], max_bound=times[end])
         )
     end
     seizure_onsets = [on for (on,off) in seizure_annotations if on < off]
