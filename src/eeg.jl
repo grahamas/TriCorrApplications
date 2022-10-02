@@ -134,7 +134,7 @@ noto_sans_bold = assetpath("fonts", "NotoSans-Bold.ttf")
 function plot_contributions!(fig, eeg::AbstractEEG, times::AbstractVector, data::AbstractArray; title=nothing, get_label, default_label_fns = Dict(
     "tricorr" => offset_motif_numeral,
     "aEEG" => (i -> eeg.labels[i])
-), consensus_plot=size(data,1), other_params...)
+), consensus_plot=true, other_params...)
     if get_label isa String
         get_label = default_label_fns[get_label]
     end
@@ -153,14 +153,10 @@ function plot_contributions!(fig, eeg::AbstractEEG, times::AbstractVector, data:
     for (ax,plt) ∈ ax_plt_pairs[1:end-1]
         hidedecorations!(ax)
     end
-    layout = if !isnothing(consensus_plot)
-        grand_layout = GridLayout()
-        grand_layout[consensus_plot,1] = layout
-        layout[consensus_plot+1,1] = cons_ax = Axis(fig)
+    if consensus_plot
+        layout[end+1,1] = cons_ax = Axis(fig)
         plot_reviewer_consensus!(cons_ax, eeg)
         linkxaxes!(first.(ax_plt_pairs)..., cons_ax)
-    else
-        layout
     end
     if title !== nothing
         layout[0,:] = Label(fig, title, tellwidth=false)
@@ -176,8 +172,8 @@ end
 
 function plot_contribution(eeg::AbstractEEG, args...; title=nothing, resolution=(800,600), kwargs...)
     fig = Figure(resolution=resolution)
-    ax = Axis(fig[1,1])
-    cons_ax = Axis(fig[2,1])
+    fig[1,1] = ax = Axis(fig)
+    fig[2,1] = cons_ax = Axis(fig)
     l = plot_contribution!(ax, eeg, args...; kwargs...)
     if title !== nothing
         Label(fig[0,:], title, tellwidth=false)
