@@ -184,10 +184,10 @@ function plot_contribution(eeg::AbstractEEG, args...; title=nothing, resolution=
     return (fig, ax, l)
 end
 
-function plot_contribution!(ax::Axis, eeg, times, data; epoch_s=nothing)
-    l = lines!(ax, times, data, color=:grey11, linecolor=:grey11)
+function plot_contribution!(ax::Axis, eeg, times, data; epoch_s=nothing, color=:grey11)
+    l = lines!(ax, times, data, color=color)
     tightlimits!(ax); hidespines!(ax)
-    hidedecorations!(ax, ticklabels=false)
+    hidedecorations!(ax, ticklabels=false, label=false)
     seizure_annotations, artifact_annotations = if isnothing(epoch_s)
         (eeg.seizure_annotations, eeg.artifact_annotations)
     else
