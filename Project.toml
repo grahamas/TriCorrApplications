@@ -1,7 +1,7 @@
 name = "TriCorrApplications"
 uuid = "8b008879-e0cd-496b-b569-b901d37ab395"
 authors = ["Graham Smith <grahamas@gmail.com> and contributors"]
-version = "0.2.0"
+version = "1.0.0"
 
 [deps]
 AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
